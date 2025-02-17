@@ -1,0 +1,30 @@
+# Go binary
+/bin/
+/obj/
+
+# Go module cache
+
+
+# Go project build files
+*.exe
+*.out
+*.test
+*.dSYM
+
+# Go vendor directory (if you're using vendoring)
+vendor/
+
+# Go IDE directories
+.idea/
+.vscode/
+
+# Go editor backups
+*~
+*.swp
+
+# Go modules files (If you want to keep these tracked, remove the next line)
+.golangci.yml
+
+# Go workspace files
+go.work
+go.work.sum
