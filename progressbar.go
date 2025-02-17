@@ -72,8 +72,15 @@ func AutoRun(ps *Options, tasks ...ProgressTask) error {
 	return nil
 }
 
+// Next will increase the progress bar by 1
+// example:step + 1
 func (p *ProgressBar) Next() error {
-	return p.bar.Add(1)
+	return p.Add(1)
+}
+
+// Add will add the specified amount to the progressbar
+func (p *ProgressBar) Add(num int) error {
+	return p.bar.Add(num)
 }
 
 // Finish will fill the bar to full
@@ -128,13 +135,20 @@ func (p *Options) Writer(w io.Writer) *Options {
 	return p
 }
 
+// Width sets the width of the bar
 func (p *Options) Width(width int) *Options {
 	p.options = append(p.options, progressbar.OptionSetWidth(width))
 	return p
 }
 
-func (p *Options) ShowTotalBytes() *Options {
-	p.options = append(p.options, progressbar.OptionShowTotalBytes(true))
+// FullWidth sets the bar to be full width
+func (p *Options) FullWidth() *Options {
+	p.options = append(p.options, progressbar.OptionFullWidth())
+	return p
+}
+
+func (p *Options) DisShowTotalBytes(val bool) *Options {
+	p.options = append(p.options, progressbar.OptionShowTotalBytes(val))
 	return p
 }
 
@@ -148,23 +162,23 @@ func (p *Options) SpinnerType(spinnerType int) *Options {
 	return p
 }
 
-func (p *Options) SpinnerCustom(spinner []string) *Options {
+// SpinnerCustom sets the spinner used for indeterminate bars to the passed
+// slice of string
+func (p *Options) SpinnerCustom(spinner ...string) *Options {
 	p.options = append(p.options, progressbar.OptionSpinnerCustom(spinner))
 	return p
 }
 
+// Theme sets the elements the bar is constructed with.
+// There are two pre-defined themes you can use: ThemeASCII and ThemeUnicode.
 func (p *Options) Theme(t progressbar.Theme) *Options {
 	p.options = append(p.options, progressbar.OptionSetTheme(t))
 	return p
 }
 
-func (p *Options) Visibility(visibility bool) *Options {
-	p.options = append(p.options, progressbar.OptionSetVisibility(visibility))
-	return p
-}
-
-func (p *Options) FullWidth() *Options {
-	p.options = append(p.options, progressbar.OptionFullWidth())
+// DisEnableVisibility enable the visibility
+func (p *Options) DisEnableVisibility() *Options {
+	p.options = append(p.options, progressbar.OptionSetVisibility(false))
 	return p
 }
 
@@ -173,19 +187,19 @@ func (p *Options) RenderBlankState(r bool) *Options {
 	return p
 }
 
-// Throttle will wait the specified duration before updating again. The default
-// duration is 0 seconds.
 func (p *Options) Throttle(duration time.Duration) *Options {
 	p.options = append(p.options, progressbar.OptionThrottle(duration))
 	return p
 }
 
-func (p *Options) ShowCount() *Options {
+// EnableShowCount will also print current count out of total
+func (p *Options) EnableShowCount() *Options {
 	p.options = append(p.options, progressbar.OptionShowCount())
 	return p
 }
 
-func (p *Options) ShowIts() *Options {
+// EnableShowIts will also print the iterations/second
+func (p *Options) EnableShowIts() *Options {
 	p.options = append(p.options, progressbar.OptionShowIts())
 	return p
 }
@@ -195,8 +209,10 @@ func (p *Options) Completion(cmpl func()) *Options {
 	return p
 }
 
-func (p *Options) EnableColorCodes(colorCodes bool) *Options {
-	p.options = append(p.options, progressbar.OptionEnableColorCodes(colorCodes))
+// EnableColorCodes enables  support for color codes ,you need there is a color code library
+// using mitchellh/colorstring
+func (p *Options) EnableColorCodes() *Options {
+	p.options = append(p.options, progressbar.OptionEnableColorCodes(true))
 	return p
 }
 
@@ -205,17 +221,14 @@ func (p *Options) ElapsedTime(elapsedTime bool) *Options {
 	return p
 }
 
-func (p *Options) PredictTime(predictTime bool) *Options {
-	p.options = append(p.options, progressbar.OptionSetPredictTime(true))
+// DisEnablePredictTime will also attempt to predict the time remaining.
+func (p *Options) DisEnablePredictTime() *Options {
+	p.options = append(p.options, progressbar.OptionSetPredictTime(false))
 	return p
 }
 
-func (p *Options) OptionShowCount() *Options {
-	p.options = append(p.options, progressbar.OptionShowCount())
-	return p
-}
-
-func (p *Options) ShowElapsedTimeOnFinish() *Options {
+// EnableElapsedTimeOnFinish will keep the display of elapsed time on finish.
+func (p *Options) EnableElapsedTimeOnFinish() *Options {
 	p.options = append(p.options, progressbar.OptionShowElapsedTimeOnFinish())
 	return p
 }
@@ -230,22 +243,30 @@ func (p *Options) ClearOnFinish() *Options {
 	return p
 }
 
-func (p *Options) OptionShowBytes(val bool) *Options {
-	p.options = append(p.options, progressbar.OptionShowBytes(val))
+// EnableShowBytes will update the progress bar
+// configuration settings to display/hide kBytes/Sec
+func (p *Options) EnableShowBytes() *Options {
+	p.options = append(p.options, progressbar.OptionShowBytes(true))
 	return p
 }
 
-func (p *Options) UseANSICodes(val bool) *Options {
-	p.options = append(p.options, progressbar.OptionUseANSICodes(val))
+// EnableANSICodes will use more optimized terminal i/o.
+//
+// Only useful in environments with support for ANSI escape sequences.
+func (p *Options) EnableANSICodes() *Options {
+	p.options = append(p.options, progressbar.OptionUseANSICodes(true))
 	return p
 }
 
-func (p *Options) OptionUseIECUnits(val bool) *Options {
-	p.options = append(p.options, progressbar.OptionUseIECUnits(val))
+// EnableIECUnits will enable IEC units (e.g. MiB) instead of the default
+// SI units (e.g. MB).
+func (p *Options) EnableIECUnits() *Options {
+	p.options = append(p.options, progressbar.OptionUseIECUnits(true))
 	return p
 }
 
-func (p *Options) ShowDescriptionAtLineEnd() *Options {
+// EnableDescriptionAtLineEnd defines whether description should be written at line end instead of line start
+func (p *Options) EnableDescriptionAtLineEnd() *Options {
 	p.options = append(p.options, progressbar.OptionShowDescriptionAtLineEnd())
 	return p
 }

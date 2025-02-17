@@ -23,7 +23,7 @@ vendor/
 *.swp
 
 # Go modules files (If you want to keep these tracked, remove the next line)
-.golangci.yml
+
 
 # Go workspace files
 go.work
