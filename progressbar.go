@@ -157,6 +157,7 @@ func (p *Options) SpinnerChangeInterval(interval time.Duration) *Options {
 	return p
 }
 
+// SpinnerType sets the type of spinner used for indeterminate bars
 func (p *Options) SpinnerType(spinnerType int) *Options {
 	p.options = append(p.options, progressbar.OptionSpinnerType(spinnerType))
 	return p

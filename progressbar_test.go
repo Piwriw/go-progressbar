@@ -39,12 +39,26 @@ func TestSpinnerCustom(t *testing.T) {
 		ProgressOptions().SpinnerCustom("a", "c", "b"),
 	)
 
-	t.Log("Progress with ClearOnFinish enable:")
-	for i := 0; i < 5; i++ {
-		Task(i)
-		barWith.Next()
+	t.Log("Progress with SpinnerCustom enable:")
+	for i := 0; i < 10; i++ {
+		//Task(i)
+		time.Sleep(120 * time.Millisecond)
+		barWith.Add(1)
 	}
+}
 
+func TestSpinnerType(t *testing.T) {
+	// 启用 EnableShowBytes
+	barWith := Add(-1,
+		ProgressOptions().SpinnerType(10),
+	)
+
+	t.Log("Progress with SpinnerType enable:")
+	for i := 0; i < 10; i++ {
+		//Task(i)
+		time.Sleep(120 * time.Millisecond)
+		barWith.Add(1)
+	}
 }
 
 func TestClearOnFinish(t *testing.T) {
