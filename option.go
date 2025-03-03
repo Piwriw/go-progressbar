@@ -1,9 +1,10 @@
 package progressbar
 
 import (
-	"github.com/schollz/progressbar/v3"
 	"io"
 	"time"
+
+	"github.com/schollz/progressbar/v3"
 )
 
 type Options struct {
@@ -11,6 +12,12 @@ type Options struct {
 }
 
 func ProgressOptions() *Options {
+	return &Options{
+		options: make([]progressbar.Option, 0),
+	}
+}
+
+func DefaultOptions() *Options {
 	return &Options{
 		options: make([]progressbar.Option, 0),
 	}

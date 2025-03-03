@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/schollz/progressbar/v3"
 	"log/slog"
-	"time"
 )
 
 const (
@@ -12,9 +11,17 @@ const (
 )
 
 type ProgressBar struct {
-	total   int
-	bar     *progressbar.ProgressBar
-	options Options
+	total int
+	bar   *progressbar.ProgressBar
+	opts  Options
+	tasks []ProgressTask
+}
+
+func NewProgressBar() *ProgressBar {
+	return &ProgressBar{
+		total: 0,
+		tasks: make([]ProgressTask, 0),
+	}
 }
 
 func (p *ProgressBar) Total(total int) *ProgressBar {
@@ -22,17 +29,14 @@ func (p *ProgressBar) Total(total int) *ProgressBar {
 	return p
 }
 
-func (p *ProgressBar) AutoUpdate(interval time.Duration, stopChan chan struct{}) {
-	ticker := time.NewTicker(interval)
-	defer ticker.Stop()
-	for {
-		select {
-		case <-ticker.C:
-			p.Next()
-		case <-stopChan:
-			return
-		}
-	}
+func (p *ProgressBar) Options(opts *Options) *ProgressBar {
+	p.opts = *opts
+	return p
+}
+
+func (p *ProgressBar) Tasks(tasks ...ProgressTask) *ProgressBar {
+	p.tasks = append(p.tasks, tasks...)
+	return p
 }
 
 // Prefix sets the prefix of the progress bar
@@ -57,10 +61,14 @@ func (p *ProgressBar) Metric(hostPort string) {
 	p.bar.StartHTTPServer(hostPort)
 }
 
-func Add(total int, ps *Options) *ProgressBar {
+func (p *ProgressBar) AddBar() *ProgressBar {
 	return &ProgressBar{
-		bar: progressbar.NewOptions(total, ps.options...),
+		bar: progressbar.NewOptions(p.total, p.opts.options...),
 	}
+}
+
+func (p *ProgressBar) genericBar() {
+	p.bar = progressbar.NewOptions(p.total, p.opts.options...)
 }
 
 type ProgressTask struct {
@@ -75,16 +83,14 @@ func NewProgressTask(fn any, params ...any) ProgressTask {
 	}
 }
 
-func AutoRun(ps *Options, tasks ...ProgressTask) error {
-	bar := &ProgressBar{
-		bar: progressbar.NewOptions(len(tasks), ps.options...),
-	}
-	for _, task := range tasks {
+func (p *ProgressBar) AutoRun() error {
+	p.genericBar()
+	for _, task := range p.tasks {
 		if err := callFunc(task.fn, task.params...); err != nil {
 			slog.Error("AutoRun", "err", err)
-			return bar.Exit()
+			return p.Exit()
 		}
-		if err := bar.Next(); err != nil {
+		if err := p.Next(); err != nil {
 			return err
 		}
 	}
