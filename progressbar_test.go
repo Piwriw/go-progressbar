@@ -10,6 +10,41 @@ import (
 	"time"
 )
 
+func TestAddSuffix(t *testing.T) {
+	bar := Add(10,
+		ProgressOptions().
+			Writer(os.Stderr).
+			Width(10).
+			DisShowTotalBytes(true).
+			Throttle(65*time.Millisecond).
+			EnableShowCount().EnableShowIts().
+			SpinnerType(14).
+			FullWidth())
+	bar.Describe("Xxx")
+	bar.Suffix("joo")
+	for i := 0; i < 10; i++ {
+		bar.Next()
+		Task(i)
+	}
+}
+
+func TestAddPrefix(t *testing.T) {
+	bar := Add(10,
+		ProgressOptions().
+			Writer(os.Stderr).
+			Width(10).
+			DisShowTotalBytes(true).
+			Throttle(65*time.Millisecond).
+			EnableShowCount().EnableShowIts().
+			SpinnerType(14).
+			FullWidth())
+	bar.Prefix("joo")
+	for i := 0; i < 10; i++ {
+		bar.Next()
+		Task(i)
+	}
+}
+
 //	func TestElapsedTime(t *testing.T) {
 //		// 启用 EnablePredictTime
 //		barWith := Add(5,

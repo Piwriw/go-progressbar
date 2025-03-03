@@ -26,6 +26,16 @@ func (p *ProgressBar) Total(total int) *ProgressBar {
 	return p
 }
 
+// Prefix sets the prefix of the progress bar
+func (p *ProgressBar) Prefix(prefix string) {
+	p.bar.Describe(prefix)
+}
+
+// Suffix sets the suffix of the progress bar
+func (p *ProgressBar) Suffix(suffix string) {
+	p.bar.Describe(p.bar.State().Description + suffix)
+}
+
 // Metric starts an HTTP server dedicated to serving progress bar updates. This allows you to
 // display the status in various UI elements, such as an OS status bar with an `xbar` extension.
 // It is recommended to run this function in a separate goroutine to avoid blocking the main thread.
