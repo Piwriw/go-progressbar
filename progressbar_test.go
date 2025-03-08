@@ -25,10 +25,9 @@ func TestAddPrefix(t *testing.T) {
 	bar := NewProgressBar().
 		Total(10).
 		Tasks(tasks...).
-		Options(DefaultOptions())
+		Options(DefaultOptions()).Create()
 	bar.Prefix("prefix")
 	bar.AutoRun()
-
 }
 
 //	func TestElapsedTime(t *testing.T) {

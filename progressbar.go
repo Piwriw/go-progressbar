@@ -2,8 +2,11 @@ package progressbar
 
 import (
 	"encoding/json"
-	"github.com/schollz/progressbar/v3"
+	"errors"
 	"log/slog"
+	"strings"
+
+	"github.com/schollz/progressbar/v3"
 )
 
 const (
@@ -15,6 +18,7 @@ type ProgressBar struct {
 	bar   *progressbar.ProgressBar
 	opts  Options
 	tasks []ProgressTask
+	err   []error
 }
 
 func NewProgressBar() *ProgressBar {
@@ -22,6 +26,28 @@ func NewProgressBar() *ProgressBar {
 		total: 0,
 		tasks: make([]ProgressTask, 0),
 	}
+}
+
+// Error 返回所有累积的错误
+func (p *ProgressBar) Error() error {
+	if len(p.err) == 0 {
+		return nil
+	}
+	return errors.New(strings.Join(p.errorMessages(), "; "))
+}
+
+// errorMessages 获取所有错误消息
+func (p *ProgressBar) errorMessages() []string {
+	messages := make([]string, len(p.err))
+	for i, err := range p.err {
+		messages[i] = err.Error()
+	}
+	return messages
+}
+
+func (p *ProgressBar) Create() *ProgressBar {
+	p.genericBar()
+	return p
 }
 
 func (p *ProgressBar) Total(total int) *ProgressBar {
@@ -41,6 +67,10 @@ func (p *ProgressBar) Tasks(tasks ...ProgressTask) *ProgressBar {
 
 // Prefix sets the prefix of the progress bar
 func (p *ProgressBar) Prefix(prefix string) {
+	if p.bar == nil {
+		p.err = append(p.err, ErrorNilBar)
+		return
+	}
 	p.bar.Describe(prefix)
 }
 
@@ -84,7 +114,9 @@ func NewProgressTask(fn any, params ...any) ProgressTask {
 }
 
 func (p *ProgressBar) AutoRun() error {
-	p.genericBar()
+	if p.Error() != nil {
+		return p.Error()
+	}
 	for _, task := range p.tasks {
 		if err := callFunc(task.fn, task.params...); err != nil {
 			slog.Error("AutoRun", "err", err)
