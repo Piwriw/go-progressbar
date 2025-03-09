@@ -2,6 +2,7 @@ package progressbar
 
 import (
 	"errors"
+	"fmt"
 	"log/slog"
 	"testing"
 	"time"
@@ -30,44 +31,38 @@ func TestAddPrefix(t *testing.T) {
 	bar.AutoRun()
 }
 
-//	func TestElapsedTime(t *testing.T) {
-//		// 启用 EnablePredictTime
-//		barWith := Add(5,
-//			ProgressOptions().ElapsedTime(false),
-//		)
-//
-//		t.Log("Progress with ElapsedTime disenabled:")
-//		for i := 0; i < 5; i++ {
-//			Task(i)
-//			barWith.Next()
-//		}
-//
-//		// 禁用 EnablePredictTime
-//		barWithout := Add(5,
-//			ProgressOptions().ElapsedTime(true),
-//		)
-//
-//		t.Log("Progress with ElapsedTime enable:")
-//		for i := 0; i < 5; i++ {
-//			Task(i)
-//			barWithout.Next()
-//		}
-//	}
-//
-//	func TestSpinnerCustom(t *testing.T) {
-//		// 启用 EnableShowBytes
-//		barWith := Add(-1,
-//			ProgressOptions().SpinnerCustom("a", "c", "b"),
-//		)
-//
-//		t.Log("Progress with SpinnerCustom enable:")
-//		for i := 0; i < 10; i++ {
-//			//Task(i)
-//			time.Sleep(120 * time.Millisecond)
-//			barWith.Add(1)
-//		}
-//	}
-//
+func TestElapsedTime(t *testing.T) {
+	// 启用 EnablePredictTime
+	barWith := NewProgressBar().Total(5).Create().Options(ProgressOptions().ElapsedTime(false))
+
+	t.Log("Progress with ElapsedTime disenabled:")
+	for i := 0; i < 5; i++ {
+		Task(i)
+		barWith.Next()
+	}
+
+	// 禁用 EnablePredictTime
+	barWithout := NewProgressBar().Total(5).Create().Options(ProgressOptions().ElapsedTime(true))
+
+	t.Log("Progress with ElapsedTime enable:")
+	for i := 0; i < 5; i++ {
+		Task(i)
+		barWithout.Next()
+	}
+}
+
+func TestSpinnerCustom(t *testing.T) {
+	// 启用 EnableShowBytes
+	barWith := NewProgressBar().Total(-1).Create().Options(ProgressOptions().SpinnerCustom("a", "c", "b"))
+
+	t.Log("Progress with SpinnerCustom enable:")
+	for i := 0; i < 10; i++ {
+		//Task(i)
+		time.Sleep(120 * time.Millisecond)
+		barWith.Add(1)
+	}
+}
+
 //	func TestSpinnerType(t *testing.T) {
 //		// 启用 EnableShowBytes
 //		barWith := Add(-1,
@@ -404,57 +399,49 @@ func TestAddPrefix(t *testing.T) {
 //			barWithout.Next()
 //		}
 //	}
-//
-//	func TestCompletion(t *testing.T) {
-//		// 启用 Completion
-//		barWithTotalBytes := Add(5,
-//			ProgressOptions().Completion(func() {
-//				fmt.Println("Progress completed!")
-//			}),
-//		)
-//
-//		t.Log("Progress with Completion enabled:")
-//		for i := 0; i < 5; i++ {
-//			Task(i)
-//			barWithTotalBytes.Next()
-//		}
-//
-//		// 禁用 Completion
-//		barWithoutTotalBytes := Add(5,
-//			ProgressOptions(),
-//		)
-//
-//		t.Log("Progress with Completion disabled:")
-//		for i := 0; i < 5; i++ {
-//			Task(i)
-//			barWithoutTotalBytes.Next()
-//		}
-//	}
-//
-//	func TestShowIts(t *testing.T) {
-//		// 启用 ShowIts
-//		barWithTotalBytes := Add(5,
-//			ProgressOptions().EnableShowIts(),
-//		)
-//
-//		t.Log("Progress with ShowIts enabled:")
-//		for i := 0; i < 5; i++ {
-//			Task(i)
-//			barWithTotalBytes.Next()
-//		}
-//
-//		// 禁用 ShowIts
-//		barWithoutTotalBytes := Add(5,
-//			ProgressOptions(),
-//		)
-//
-//		t.Log("Progress with ShowIts disabled:")
-//		for i := 0; i < 5; i++ {
-//			Task(i)
-//			barWithoutTotalBytes.Next()
-//		}
-//	}
-//
+func TestCompletion(t *testing.T) {
+	// 启用 Completion
+	barWithCompletion := NewProgressBar().Total(5).Create().Options(ProgressOptions().Completion(func() {
+		fmt.Println("Progress completed!")
+	}))
+
+	t.Log("Progress with Completion enabled:")
+	for i := 0; i < 5; i++ {
+		Task(i)
+		barWithCompletion.Next()
+	}
+
+	// 禁用 Completion
+	bar := NewProgressBar().Total(5).Create().Options(ProgressOptions())
+
+	t.Log("Progress with Completion disabled:")
+	for i := 0; i < 5; i++ {
+		Task(i)
+		bar.Next()
+	}
+}
+
+func TestShowIts(t *testing.T) {
+	// 启用 ShowIts
+
+	barWithShowIts := NewProgressBar().Total(5).Create().Options(ProgressOptions().EnableShowIts())
+
+	t.Log("Progress with ShowIts enabled:")
+	for i := 0; i < 5; i++ {
+		Task(i)
+		barWithShowIts.Next()
+	}
+
+	// 禁用 ShowIts
+	bar := NewProgressBar().Total(5).Create().Options(ProgressOptions())
+
+	t.Log("Progress with ShowIts disabled:")
+	for i := 0; i < 5; i++ {
+		Task(i)
+		bar.Next()
+	}
+}
+
 //	func TestShowTotalBytes(t *testing.T) {
 //		// 启用 ShowTotalBytes
 //		barWithTotalBytes := Add(10,

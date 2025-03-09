@@ -51,10 +51,6 @@ func (p *ProgressBar) Create() *ProgressBar {
 }
 
 func (p *ProgressBar) Total(total int) *ProgressBar {
-	if total <= 0 {
-		p.err = append(p.err, ErrInvalidTotal)
-		return p
-	}
 	p.total = total
 	return p
 }
@@ -140,52 +136,90 @@ func (p *ProgressBar) AutoRun() error {
 // Next will increase the progress bar by 1
 // example:step + 1
 func (p *ProgressBar) Next() error {
+	if p.Error() != nil {
+		return p.Error()
+	}
 	return p.Add(1)
 }
 
 // Add will add the specified amount to the progressbar
 func (p *ProgressBar) Add(num int) error {
+	if p.Error() != nil {
+		return p.Error()
+	}
 	return p.bar.Add(num)
 }
 
 // Finish will fill the bar to full
 func (p *ProgressBar) Finish() error {
+	if p.bar == nil {
+		p.err = append(p.err, ErrNilBar)
+		return p.Error()
+	}
 	return p.bar.Finish()
 }
 
 // Exit will exit the bar to keep current state
 func (p *ProgressBar) Exit() error {
+	if p.bar == nil {
+		p.err = append(p.err, ErrNilBar)
+		return p.Error()
+	}
 	return p.bar.Exit()
 }
 
 // Clear erases the progress bar from the current line
 func (p *ProgressBar) Clear() error {
+	if p.bar == nil {
+		p.err = append(p.err, ErrNilBar)
+		return p.Error()
+	}
 	return p.bar.Clear()
 }
 
 // Set will set the bar to a current number
 func (p *ProgressBar) Set(step int) error {
+	if p.bar == nil {
+		p.err = append(p.err, ErrNilBar)
+		return p.Error()
+	}
 	return p.bar.Set(step)
 }
 
 // IsFinished returns true if progress bar is completed
 func (p *ProgressBar) IsFinished() bool {
+	if p.bar == nil {
+		p.err = append(p.err, ErrNilBar)
+		return false
+	}
 	return p.bar.IsFinished()
 }
 
 // IsStarted returns true if progress bar is started
 func (p *ProgressBar) IsStarted() bool {
+	if p.bar == nil {
+		p.err = append(p.err, ErrNilBar)
+		return false
+	}
 	return p.bar.IsStarted()
 }
 
 // State returns the current state
 func (p *ProgressBar) State() progressbar.State {
+	if p.bar == nil {
+		p.err = append(p.err, ErrNilBar)
+		return progressbar.State{}
+	}
 	return p.bar.State()
 }
 
 // Describe will change the description shown before the progress, which
 // can be changed on the fly (as for a slow running process).
 func (p *ProgressBar) Describe(description string) {
+	if p.bar == nil {
+		p.err = append(p.err, ErrNilBar)
+		return
+	}
 	p.bar.Describe(description)
 }
 
