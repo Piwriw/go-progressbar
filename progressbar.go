@@ -51,6 +51,10 @@ func (p *ProgressBar) Create() *ProgressBar {
 }
 
 func (p *ProgressBar) Total(total int) *ProgressBar {
+	if total <= 0 {
+		p.err = append(p.err, ErrInvalidTotal)
+		return p
+	}
 	p.total = total
 	return p
 }
@@ -68,7 +72,7 @@ func (p *ProgressBar) Tasks(tasks ...ProgressTask) *ProgressBar {
 // Prefix sets the prefix of the progress bar
 func (p *ProgressBar) Prefix(prefix string) {
 	if p.bar == nil {
-		p.err = append(p.err, ErrorNilBar)
+		p.err = append(p.err, ErrNilBar)
 		return
 	}
 	p.bar.Describe(prefix)
@@ -76,6 +80,10 @@ func (p *ProgressBar) Prefix(prefix string) {
 
 // Suffix sets the suffix of the progress bar
 func (p *ProgressBar) Suffix(suffix string) {
+	if p.bar == nil {
+		p.err = append(p.err, ErrNilBar)
+		return
+	}
 	p.bar.Describe(p.bar.State().Description + suffix)
 }
 
